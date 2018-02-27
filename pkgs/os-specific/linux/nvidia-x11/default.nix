@@ -24,7 +24,13 @@ rec {
     persistencedSha256 = "02lf9b6j85amc1vr84lj98q74a680nrx4fmpxj17cz597yq8s200";
   };
 
-  beta = stable; # not enough interest to maintain beta ATM
+  beta = generic {
+    version = "390.25";
+    sha256_32bit = "0fkbpx01l46pprrd4nlc2y6hfmkb55ddlwm1r84kr6j08qmmb0qi";
+    sha256_64bit = "0whsls1mm6vkll5qmxnyz8vjgspp1rmqpsampgi83k62n514c08r";
+    settingsSha256 = "1jhbr68z36s3fr9vx3ga2f6yrzlwpc0j5mw8h12g65p7wdsbk6y7";
+    persistencedSha256 = "033azbhi50f1b0lw759sncgf7ckh2m2c0khj5v15sch9kl1fzk8i";
+  };
 
 
   legacy_340 = generic {
