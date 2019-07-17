@@ -46,15 +46,15 @@ assert useWayland -> wayland != null && wayland-protocols != null && waylandpp !
 # - check if dbus support PR has been merged and add dbus as a buildInput
 
 let
-  kodiReleaseDate = "20190129";
-  kodiVersion = "18.1";
+  kodiReleaseDate = "20190619";
+  kodiVersion = "18.3";
   rel = "Leia";
 
   kodi_src = fetchFromGitHub {
     owner  = "xbmc";
     repo   = "xbmc";
     rev    = "${kodiVersion}-${rel}";
-    sha256 = "1w26aqvzxv4c70gcd1vw1pldapsc2xcacwq9b7dqx5m44j0zx1dc";
+    sha256 = "18fbl5hs3aqccrn0m3x7hp95wlafjav0yvrwmb5q3gj24mwf6jld";
   };
 
   kodiDependency = { name, version, rev, sha256, ... } @attrs:
