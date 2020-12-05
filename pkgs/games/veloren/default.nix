@@ -42,9 +42,38 @@ let
     sha256 = "sha256-CgFxZP1aktO4tt9UWMz9NswoBP9Y8NXakHjXQ880Mdw=";
   };
 
-  cratesToBuild = [ "veloren-voxygen" "veloren-server-cli" ];
+  rustOverlay = import ./rustOverlay.nix { inherit pkgs veloren-src; };
 
-  common = import ./common.nix { inherit pkgs veloren-src; };
+  # deps that crates need (for compiling)
+  crateDeps = with rustOverlay; {
+    libudev-sys = {
+      buildInputs = [ libudev ];
+      nativeBuildInputs = [ pkg-config ];
+    };
+    alsa-sys = {
+      buildInputs = [ alsaLib ];
+      nativeBuildInputs = [ pkg-config ];
+    };
+    veloren-network = {
+      buildInputs = [ openssl ];
+      nativeBuildInputs = [ pkg-config ];
+    };
+    veloren-voxygen = {
+      buildInputs = [ xorg.libxcb ];
+      nativeBuildInputs = [ ];
+    };
+  };
+
+  # deps that voxygen needs to function
+  # FIXME: Wayland doesn't work (adding libxkbcommon, wayland and wayland-protocols results in a panic)
+  voxygenNeededLibs = with rustOverlay; [
+    libGL
+  ] ++ (with xorg; [
+    libX11
+    libXcursor
+    libXi
+    libXrandr
+  ]);
 
   meta = with pkgs.stdenv.lib; {
     description = "Veloren is a multiplayer voxel RPG written in Rust.";
@@ -98,9 +127,9 @@ let
     categories = "Game;";
   };
 
-  veloren-crates = with common.mozOverlay;
+  veloren-crates = with rustOverlay;
     callPackage "${veloren-src}/nix/Cargo.nix" {
-      defaultCrateOverrides = with { inherit (common) crateDeps; };
+      defaultCrateOverrides = with { inherit crateDeps; };
         defaultCrateOverrides // {
           libudev-sys = _: crateDeps.libudev-sys;
           alsa-sys = _: crateDeps.alsa-sys;
@@ -141,7 +170,7 @@ let
               wrapProgram $out/bin/veloren-voxygen\
                 --set VELOREN_ASSETS ${veloren-assets}\
                 --set LD_LIBRARY_PATH ${
-                  lib.makeLibraryPath common.voxygenNeededLibs
+                  lib.makeLibraryPath voxygenNeededLibs
                 }
             '';
             meta = meta // {
